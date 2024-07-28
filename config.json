@@ -1,0 +1,27 @@
+{
+    "model_paths": {
+      "tfidf_random_forest": "RF&TF.pkl",
+      "count_random_forest": "RF&CV.pkl",
+      "tfidf_adaboost": "AB&TF.pkl",
+      "count_adaboost": "AB&CV.pkl",
+      "tfidf_svm": "SVM&TF.pkl",
+      "count_svm": "SVM&CV.pkl",
+      "tfidf_gradient_boosting": "GBC&TF.pkl",
+      "count_gradient_boosting": "GBC&CV.pkl",
+      "tfidf_logistic_regression": "LR&TF.pkl",
+      "count_logistic_regression": "LR&CV.pkl"
+    },
+    "accuracies": {
+      "tfidf_random_forest": 0.816,
+      "count_random_forest": 0.841,
+      "tfidf_adaboost": 0.42,
+      "count_adaboost": 0.42,
+      "tfidf_svm": 0.758,
+      "count_svm": 0.816,
+      "tfidf_gradient_boosting": 0.84,
+      "count_gradient_boosting": 0.853,
+      "tfidf_logistic_regression": 0.783,
+      "count_logistic_regression": 0.785
+    }
+  }
+  

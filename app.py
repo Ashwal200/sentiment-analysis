@@ -1,51 +1,90 @@
-from flask import Flask, request, jsonify, render_template # type: ignore
-import numpy as np
-import pandas as pd
-from sklearn.feature_extraction.text import TfidfVectorizer, CountVectorizer
-from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier
-from sklearn.svm import SVC
-from sklearn.linear_model import LogisticRegression
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
+from flask import Flask, request, jsonify, render_template
 import joblib
+from sklearn.base import BaseEstimator, TransformerMixin
+from imblearn.over_sampling import SMOTE
+import numpy as np
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
+import nltk
 import json
+
+# Custom tokenizer
+stop_words = set(stopwords.words('english'))
+
+def custom_tokenizer(text, stop_words=stop_words):
+    tokens = word_tokenize(text.lower())
+    return [token for token in tokens if token.isalnum() and token not in stop_words]
+
+def tokenizer(text):
+    return custom_tokenizer(text)
+
+
+# Custom feature extractors
+class TextLengthExtractor(BaseEstimator, TransformerMixin):
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        return np.array([len(text.split()) for text in X]).reshape(-1, 1)
+
+class ExclamationCountExtractor(BaseEstimator, TransformerMixin):
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        return np.array([text.count('!') for text in X]).reshape(-1, 1)
+
+class UppercaseRatioExtractor(BaseEstimator, TransformerMixin):
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        return np.array([sum(1 for c in text if c.isupper()) / len(text) if len(text) > 0 else 0 for text in X]).reshape(-1, 1)
+
+class SentimentScoreExtractor(BaseEstimator, TransformerMixin):
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        return np.array([sia.polarity_scores(text)['compound'] for text in X]).reshape(-1, 1)
+
+class TextBlobFeaturesExtractor(BaseEstimator, TransformerMixin):
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        features = []
+        for text in X:
+            blob = TextBlob(text)
+            features.append([
+                blob.sentiment.polarity,
+                blob.sentiment.subjectivity,
+            ])
+        return np.array(features)
+
+# Custom transformer for SMOTE
+class SMOTETransformer(BaseEstimator, TransformerMixin):
+    def __init__(self, random_state=42):
+        self.random_state = random_state
+        self.smote = SMOTE(random_state=self.random_state)
+
+    def fit(self, X, y):
+        return self
+
+    def transform(self, X, y=None):
+        if y is not None:
+            X_resampled, y_resampled = self.smote.fit_resample(X, y)
+            return X_resampled
+        return X
 
 app = Flask(__name__)
 
-# Load dataset
-df = pd.read_csv('sampled_data.csv', header=None, names=['text', 'label'], delimiter=',', quoting=3)
-X = df['text']
-y = df['label']
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+# Load configuration from file
+with open('config.json', 'r') as f:
+    config = json.load(f)
 
-# Predefined text processing and classification tools
-vectorizers = {
-    'tfidf': TfidfVectorizer(max_features=5000),
-    'count': CountVectorizer(max_features=5000)
-    # Add Word2Vec if necessary
-}
-
-classifiers = {
-    'random_forest': RandomForestClassifier(random_state=42),
-    'adaboost': AdaBoostClassifier(random_state=42),
-    'svm': SVC(kernel='linear', random_state=42),
-    'gradient_boosting': GradientBoostingClassifier(random_state=42),
-    'logistic_regression': LogisticRegression(random_state=42)
-}
-
-# Train models and store accuracy
-accuracies = {}
-
-for vec_name, vectorizer in vectorizers.items():
-    X_train_vect = vectorizer.fit_transform(X_train)
-    X_test_vect = vectorizer.transform(X_test)
-    
-    for clf_name, classifier in classifiers.items():
-        classifier.fit(X_train_vect, y_train)
-        y_pred = classifier.predict(X_test_vect)
-        accuracy = accuracy_score(y_test, y_pred)
-        accuracies[f'{vec_name}_{clf_name}'] = accuracy
-        joblib.dump((vectorizer, classifier), f'{vec_name}_{clf_name}.pkl')
+model_paths = config['model_paths']
+accuracies = config['accuracies']
 
 @app.route('/')
 def index():
@@ -53,22 +92,28 @@ def index():
 
 @app.route('/get_accuracy', methods=['GET'])
 def get_accuracy():
-    vec_name = request.args.get('vectorizer')
-    clf_name = request.args.get('classifier')
-    accuracy = accuracies.get(f'{vec_name}_{clf_name}', 'Invalid combination')
+    vectorizer = request.args.get('vectorizer')
+    classifier = request.args.get('classifier')
+    model_key = f"{vectorizer}_{classifier}"
+    accuracy = accuracies.get(model_key, 'Invalid combination')
     return jsonify({'accuracy': accuracy})
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    data = json.loads(request.data)
+    data = request.get_json()
     sentence = data['sentence']
-    vec_name = data['vectorizer']
-    clf_name = data['classifier']
+    vectorizer = data['vectorizer']
+    classifier = data['classifier']
+    model_key = f"{vectorizer}_{classifier}"
     
-    vectorizer, classifier = joblib.load(f'{vec_name}_{clf_name}.pkl')
-    sentence_vect = vectorizer.transform([sentence])
-    prediction = classifier.predict(sentence_vect)
-    return jsonify({'prediction': prediction[0]})
+    if model_key in model_paths:
+        vectorizer, classifier = joblib.load("models/" + model_paths[model_key])
+        sentence_vect = vectorizer.transform([sentence])
+        prediction = classifier.predict(sentence_vect)
+        print(prediction)
+        return jsonify({'prediction': prediction[0]})
+    else:
+        return jsonify({'error': 'Invalid vectorizer or classifier'})
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=8000)
