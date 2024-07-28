@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sentiment Analysis</title>
+    <style>
+        /* Add your CSS here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Sentiment Analysis</h1>
+        <div class="form-group">
+            <label for="vectorizer">Select Text Processing Tool:</label>
+            <select id="vectorizer">
+                <option value="tfidf">TF-IDF</option>
+                <option value="count">Count Vectorizer</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="classifier">Select Classification Tool:</label>
+            <select id="classifier">
+                <option value="random_forest">Random Forest</option>
+                <option value="adaboost">Adaboost</option>
+                <option value="svm">SVM</option>
+                <option value="gradient_boosting">Gradient Boosting Classifier</option>
+                <option value="logistic_regression">Logistic Regression</option>
+            </select>
+        </div>
+        <button onclick="getAccuracy()">Get Accuracy</button>
+        <div id="accuracy" class="result"></div>
+        <div class="form-group">
+            <br/>
+            <label for="sentence">Enter a Sentence:</label>
+            <input type="text" id="sentence" placeholder="Type your sentence here...">
+        </div>
+        <button onclick="getPrediction()">Get Prediction</button>
+        <div id="prediction" class="result"></div>
+    </div>
+
+    <script>
+        async function getAccuracy() {
+            const vectorizer = document.getElementById('vectorizer').value;
+            const classifier = document.getElementById('classifier').value;
+            const response = await fetch(`/get_accuracy?vectorizer=${vectorizer}&classifier=${classifier}`);
+            const data = await response.json();
+            document.getElementById('accuracy').innerText = `Accuracy: ${data.accuracy}`;
+        }
+
+        async function getPrediction() {
+            const sentence = document.getElementById('sentence').value;
+            const vectorizer = document.getElementById('vectorizer').value;
+            const classifier = document.getElementById('classifier').value;
+            const response = await fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ sentence, vectorizer, classifier })
+            });
+            const data = await response.json();
+            document.getElementById('prediction').innerText = `Prediction: ${data.prediction}`;
+        }
+    </script>
+</body>
+</html>
