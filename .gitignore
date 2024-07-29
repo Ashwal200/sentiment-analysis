@@ -1,2 +1,3 @@
 del*
 myenv
+__pycache__
