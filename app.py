@@ -14,12 +14,13 @@ from scipy.sparse import hstack
 
 # import features
 from models.features import calculate_text_features_gbc_tf as GBC_TF
+from models.features import calculate_text_features_gbc_cv as GBC_CV
 # ...
 
 module_name_to_func = {
     'GBC_TF': GBC_TF,
+    'GBC_CV': GBC_CV,
 }
-
 
 # Custom tokenizer
 stop_words = set(stopwords.words('english'))
@@ -30,7 +31,6 @@ def custom_tokenizer(text, stop_words=stop_words):
 
 def tokenizer(text):
     return custom_tokenizer(text)
-
 
 # Custom feature extractors
 class TextLengthExtractor(BaseEstimator, TransformerMixin):
