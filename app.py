@@ -38,63 +38,6 @@ def custom_tokenizer(text, stop_words=stop_words):
 def tokenizer(text):
     return custom_tokenizer(text)
 
-# Custom feature extractors
-class TextLengthExtractor(BaseEstimator, TransformerMixin):
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X):
-        return np.array([len(text.split()) for text in X]).reshape(-1, 1)
-
-class ExclamationCountExtractor(BaseEstimator, TransformerMixin):
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X):
-        return np.array([text.count('!') for text in X]).reshape(-1, 1)
-
-class UppercaseRatioExtractor(BaseEstimator, TransformerMixin):
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X):
-        return np.array([sum(1 for c in text if c.isupper()) / len(text) if len(text) > 0 else 0 for text in X]).reshape(-1, 1)
-
-class SentimentScoreExtractor(BaseEstimator, TransformerMixin):
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X):
-        return np.array([sia.polarity_scores(text)['compound'] for text in X]).reshape(-1, 1)
-
-class TextBlobFeaturesExtractor(BaseEstimator, TransformerMixin):
-    def fit(self, X, y=None):
-        return self
-
-    def transform(self, X):
-        features = []
-        for text in X:
-            blob = TextBlob(text)
-            features.append([
-                blob.sentiment.polarity,
-                blob.sentiment.subjectivity,
-            ])
-        return np.array(features)
-
-# Custom transformer for SMOTE
-class SMOTETransformer(BaseEstimator, TransformerMixin):
-    def __init__(self, random_state=42):
-        self.random_state = random_state
-        self.smote = SMOTE(random_state=self.random_state)
-
-    def fit(self, X, y):
-        return self
-
-    def transform(self, X, y=None):
-        if y is not None:
-            X_resampled, y_resampled = self.smote.fit_resample(X, y)
-            return X_resampled
-        return X
 
 app = Flask(__name__)
 
