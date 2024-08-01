@@ -15,11 +15,17 @@ from scipy.sparse import hstack
 # import features
 from models.features import calculate_text_features_gbc_tf as GBC_TF
 from models.features import calculate_text_features_gbc_cv as GBC_CV
+from models.features import calculate_text_features_svm_tf as SVM_TF
+from models.features import calculate_text_features_lr_cv as LR_CV
+from models.features import calculate_text_features_lr_tf as LR_TF
 # ...
 
 module_name_to_func = {
     'GBC_TF': GBC_TF,
     'GBC_CV': GBC_CV,
+    'SVM_TF': SVM_TF,
+    'LR_CV': LR_CV,
+    'LR_TF': LR_TF,
 }
 
 # Custom tokenizer
