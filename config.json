@@ -18,8 +18,8 @@
         "count_naivebase": 0.697,
         "tfidf_svm": 0.759,
         "count_svm": 0.817,
-        "tfidf_gradient_boosting": 0.843,
-        "count_gradient_boosting": 0.853,
+        "tfidf_gradient_boosting": 0.888,
+        "count_gradient_boosting": 0.892,
         "tfidf_logistic_regression": 0.784,
         "count_logistic_regression": 0.786
     }
