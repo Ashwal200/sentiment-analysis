@@ -21,7 +21,7 @@ from models.features import calculate_text_features_lr_tf as LR_TF
 # ...
 
 module_name_to_func = {
-    'GBC_TF': GBC_TF,
+    # 'GBC_TF': GBC_TF,
     'GBC_CV': GBC_CV,
     'SVM_TF': SVM_TF,
     'LR_CV': LR_CV,
