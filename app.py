@@ -69,9 +69,15 @@ def predict():
     model_key = f"{vectorizer}_{classifier}"
     
     if model_key in model_paths:
-        vectorizer, classifier = joblib.load("trained_models/" + model_paths[model_key])
-        sentence_vect = vectorizer.transform([sentence])
-        
+        if model_key.split('_')[1] == 'naivebase':
+            vectorizer, classifier , selector = joblib.load("trained_models/" + model_paths[model_key])
+            sentence_vect = vectorizer.transform([sentence])
+            # Apply feature selection to new sentences
+            sentence_vect = selector.transform(sentence_vect)
+        else:
+            vectorizer, classifier = joblib.load("trained_models/" + model_paths[model_key])
+            sentence_vect = vectorizer.transform([sentence])
+
         # Load the correct feature calculation function
         try:
             calculate_text_features = module_name_to_func[model_paths[model_key][:-4]]
