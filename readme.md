@@ -70,11 +70,6 @@ Explore our app to:
    ```bash
    pip install -r requirements.txt
    ```
-   You can use our enviroment:
-   ```bash
-   - On Windows - run myenv\Scripts\activate
-   - On macOS and Linux - source myenv/bin/activate
-   ```
 
 ## Usage
 
