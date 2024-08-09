@@ -26,26 +26,27 @@ This project aims to classify text into six emotion labels using various machine
 
 - **Model**: Gradient Boosting
 - **Feature Extraction**: Count Vectorizer
-- **Accuracy**: 89.2%
+- **Accuracy**: 89.5%
 
 ## Feature Engineering
 
-We added the following features to enhance our model's performance:
-- **Word Count**
-- **Average Word Length**
-- **Punctuation Count**
-- **Stopword Count**
-- **Digit Count**
-- **POS Tagging (Noun Count)**
-- **Exclamation Count**
-- **Question Count**
-- **Title Word Count**
+To enhance our model's performance, we incorporated additional features that capture various aspects of the text data. These features were selected to provide the model with more context and improve its ability to predict sentiment accurately.
+- **Word Count**: Counts the total number of words in a text.
+- **Average Word Length**: Calculates the average length of words in a text.
+- **Punctuation Count**: Counts the number of punctuation marks in a text.
+- **Stopword Count**: Counts the number of common stopwords in a text (e.g., "the," "and").
+- **Digit Count**: Counts the number of digits or numbers in a text.
+- **POS Tagging (Noun Count)**: Counts the number of nouns in a text using Part-of-Speech tagging.
+- **Exclamation Count**: Counts the number of exclamation marks, which may indicate strong emotions.
+- **Question Count**: Counts the number of question marks, which may suggest inquisitiveness or doubt.
+- **Title Word Count**: Counts the number of title-cased words, which might indicate proper nouns or emphasis.
 
 ## Training Techniques
 
 1. **Pipeline**: Integrated preprocessing and model training steps to streamline the workflow.
 2. **GridSearchCV**: Used for hyperparameter tuning to find the best model settings.
 3. **Feature Integration**: Added custom features to improve model accuracy and performance.
+1. **SelectKBest**: Focuses on the most significant features, reducing dimensionality and improving model results.
 
 ## Demo
 
