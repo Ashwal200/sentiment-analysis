@@ -70,6 +70,11 @@ Explore our app to:
    ```bash
    pip install -r requirements.txt
    ```
+   You can use our enviroment:
+   ```bash
+   - On Windows - run myenv\Scripts\activate
+   - On macOS and Linux - source myenv/bin/activate
+   ```
 
 ## Usage
 
@@ -78,6 +83,7 @@ Explore our app to:
    python app.py
    ```
 2. Open your web browser and navigate to `http://localhost:8000`.
+3. Feel free to explore our application...
 
 ## Conclusion
 
