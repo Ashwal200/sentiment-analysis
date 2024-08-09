@@ -1,28 +1,19 @@
 from flask import Flask, request, jsonify, render_template
 import joblib
-from sklearn.base import BaseEstimator, TransformerMixin
-from imblearn.over_sampling import SMOTE
 import numpy as np
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-import nltk
 import json
-import importlib.util
 import numpy as np
-import pandas as pd
 from scipy.sparse import hstack
 
 # import features
-from models.features import calculate_text_features_gbc_tf as GBC_TF
-from models.features import calculate_text_features_gbc_cv as GBC_CV
 from models.features import calculate_text_features_svm_tf as SVM_TF
 from models.features import calculate_text_features_lr_cv as LR_CV
 from models.features import calculate_text_features_lr_tf as LR_TF
-# ...
+
 
 module_name_to_func = {
-    # 'GBC_TF': GBC_TF,
-    'GBC_CV': GBC_CV,
     'SVM_TF': SVM_TF,
     'LR_CV': LR_CV,
     'LR_TF': LR_TF,
@@ -87,8 +78,10 @@ def predict():
             sentence_combined_vect = hstack([sentence_vect, np.array([additional_features])])
         except:
             sentence_combined_vect = sentence_vect
-            
-        prediction = classifier.predict(sentence_combined_vect)
+        if model_key == 'count_gradient_boosting':
+            prediction = classifier.named_steps['classifier'].predict(sentence_combined_vect)
+        else:
+            prediction = classifier.predict(sentence_combined_vect)
         print(prediction)
         return jsonify({'prediction': prediction[0]})
     
